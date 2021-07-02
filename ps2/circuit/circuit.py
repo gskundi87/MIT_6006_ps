@@ -408,16 +408,16 @@ class PriorityQueue:
         r = self.right(index)
         
         if l < self.heapSize and self.queue[l] < self.queue[index]:
-            largest = l
+            smallest = l
         else:
-            largest = index
+            smallest = index
             
-        if r < self.heapSize and self.queue[r] < self.queue[largest]:
-            largest = r
+        if r < self.heapSize and self.queue[r] < self.queue[smallest]:
+            smallest = r
             
-        if largest != index:
-            self.queue[index], self.queue[largest] = self.queue[largest], self.queue[index]
-            self.minHeapify(largest)
+        if smallest != index:
+            self.queue[index], self.queue[smallest] = self.queue[smallest], self.queue[index]
+            self.minHeapify(smallest)
             
     def buildMinHeap(self):
         self.heapSize = len(self.queue)
