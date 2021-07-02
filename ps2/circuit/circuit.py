@@ -390,6 +390,7 @@ class PriorityQueue:
         if self.isSorted == False:
             self.heapsort()
 
+        self.min_index = 0
         return 0
 
     def parent(self, index):
