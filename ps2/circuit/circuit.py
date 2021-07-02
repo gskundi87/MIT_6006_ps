@@ -378,7 +378,6 @@ class PriorityQueue:
             return None
         self._find_min()
         popped_key = self.queue.pop(self.min_index)
-        self.min_index = None
         return popped_key
     
     def _find_min(self):
