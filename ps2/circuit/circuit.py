@@ -358,14 +358,12 @@ class PriorityQueue:
             raise ValueError('Cannot insert None in the queue')
         self.queue.append(key)
         self.buildMinHeap()
-        self.min_index = 0
     
     def min(self):
         """The smallest element in the queue."""
         if len(self.queue) == 0:
             return None
-        self._find_min()
-        return self.queue[self.min_index]
+        return self.queue[0]
     
     def pop(self):
         """Removes the minimum element in the queue.
@@ -373,11 +371,12 @@ class PriorityQueue:
         Returns:
             The value of the removed element.
         """
-        if len(self.queue) == 0:
+        length = len(self.queue)
+        if length == 0:
             return None
-        self._find_min()
-        popped_key = self.queue.pop(self.min_index)
-        self.buildMinHeap()
+        self.queue[0], self.queue[length] = self.queue[length], self.queue[0]
+        popped_key = self.queue.pop(length)
+        self.minHeapify(0)
         return popped_key
     
     def _find_min(self):
