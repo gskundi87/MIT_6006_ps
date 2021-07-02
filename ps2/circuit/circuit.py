@@ -414,7 +414,7 @@ class PriorityQueue:
             largest = r
             
         if largest != index:
-            self.list[index], self.queue[largest] = self.queue[largest], self.queue[index]
+            self.queue[index], self.queue[largest] = self.queue[largest], self.queue[index]
             self.maxHeapify(largest)
             
     def buildMaxHeap(self):
