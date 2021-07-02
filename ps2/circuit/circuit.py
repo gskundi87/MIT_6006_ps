@@ -376,6 +376,7 @@ class PriorityQueue:
             return None
         self.queue[0], self.queue[length-1] = self.queue[length-1], self.queue[0]
         popped_key = self.queue.pop(length-1)
+        heapsize -= 1
         self.minHeapify(0)
         return popped_key
     
