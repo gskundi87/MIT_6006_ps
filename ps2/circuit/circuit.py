@@ -347,7 +347,6 @@ class PriorityQueue:
         self.queue = []
         self.min_index = None
         self.heapsize = 0
-        self.isHeap = False
     
     def __len__(self):
         # Number of elements in the queue.
@@ -358,8 +357,8 @@ class PriorityQueue:
         if key is None:
             raise ValueError('Cannot insert None in the queue')
         self.queue.append(key)
-        self.min_index = None
-        self.isHeap = False
+        self.buildMinHeap()
+        self.min_index = 0
     
     def min(self):
         """The smallest element in the queue."""
@@ -378,19 +377,13 @@ class PriorityQueue:
             return None
         self._find_min()
         popped_key = self.queue.pop(self.min_index)
-        self.isHeap = False
-        self.min_index = None
+        self.buildMinHeap()
         return popped_key
     
     def _find_min(self):
         # Computes the index of the minimum element in the queue.
         #
         # This method may crash if called when the queue is empty.
-        if self.min_index is not None:
-            return
-        if self.isHeap == False:
-            self.buildMinHeap()
-
         self.min_index = 0
         return self.min_index
 
