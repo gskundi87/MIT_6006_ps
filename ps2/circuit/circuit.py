@@ -374,8 +374,8 @@ class PriorityQueue:
         length = len(self.queue)
         if length == 0:
             return None
-        self.queue[0], self.queue[length] = self.queue[length], self.queue[0]
-        popped_key = self.queue.pop(length)
+        self.queue[0], self.queue[length-1] = self.queue[length-1], self.queue[0]
+        popped_key = self.queue.pop(length-1)
         self.minHeapify(0)
         return popped_key
     
