@@ -346,6 +346,8 @@ class PriorityQueue:
         """Initially empty priority queue."""
         self.queue = []
         self.min_index = None
+        self.heapsize = 0
+        self.isSorted = False
     
     def __len__(self):
         # Number of elements in the queue.
@@ -357,6 +359,7 @@ class PriorityQueue:
             raise ValueError('Cannot insert None in the queue')
         self.queue.append(key)
         self.min_index = None
+        self.isSorted = False
     
     def min(self):
         """The smallest element in the queue."""
@@ -384,13 +387,51 @@ class PriorityQueue:
         # This method may crash if called when the queue is empty.
         if self.min_index is not None:
             return
-        min = self.queue[0]
-        self.min_index = 0
-        for i in xrange(1, len(self.queue)):
-            key = self.queue[i]
-            if key < min:
-                min = key
-                self.min_index = i
+        if self.isSorted == False:
+            self.heapsort()
+
+        return 0
+
+    def parent(self, index):
+        return (index - 1) // 2
+    
+    def left(self, index):
+        return 2*index + 1
+    
+    def right(self, index):
+        return 2*index + 2
+        
+    def maxHeapify(self, index):
+        l = self.left(index)
+        r = self.right(index)
+        
+        if l < self.heapSize and self.queue[l] > self.queue[index]:
+            largest = l
+        else:
+            largest = index
+            
+        if r < self.heapSize and self.queue[r] > self.queue[largest]:
+            largest = r
+            
+        if largest != index:
+            self.list[index], self.queue[largest] = self.queue[largest], self.queue[index]
+            self.maxHeapify(largest)
+            
+    def buildMaxHeap(self):
+        self.heapSize = len(self.queue)
+        
+        for x in range((len(self.queue) - 1) // 2, -1, -1):
+            self.maxHeapify(x)
+            
+    def heapsort(self):
+        self.buildMaxHeap()
+        
+        for x in range(len(self.queue) - 1, 0, -1):
+            self.queue[0], self.queue[x] = self.queue[x], self.queue[0]
+            self.heapSize = self.heapSize - 1
+            self.maxHeapify(0)
+
+        self.isSorted = True
 
 class Simulation:
     """State needed to compute a circuit's state as it evolves over time."""
