@@ -393,6 +393,7 @@ class Transition:
 #                 self.min_index = i
 
 class PriorityQueue:
+    """Heap-based priority queue implementation."""
     def __init__(self):
         self.heap = [None]
 
@@ -419,6 +420,11 @@ class PriorityQueue:
                 break
       
     def pop(self):
+        """Removes the minimum element in the queue.
+    
+        Returns:
+            The value of the removed element.
+        """
         if len(self.heap) == 1:
             return None
 
@@ -447,6 +453,7 @@ class PriorityQueue:
             self.minHeapify(smallest)
 
     def min(self):
+        """Returns the smallest element in the queue."""
         if len(self.heap) == 1:
             return None
         return self.heap[1]
