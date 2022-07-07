@@ -1,4 +1,4 @@
 @echo off
 set TRACE=jsonp
-python circuit.py
+%python2% circuit.py
 set TRACE=
