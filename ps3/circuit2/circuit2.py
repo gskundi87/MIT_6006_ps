@@ -126,8 +126,7 @@ class WireLayer(object):
     Returns a new Simulation instance."""
 
     layer = WireLayer()
-    # fh = open(file, "r")
-
+    
     while True:
       command = file.readline().split()
       if command[0] == 'wire':
@@ -135,8 +134,6 @@ class WireLayer(object):
         layer.add_wire(command[1], *coordinates)
       elif command[0] == 'done':
         break
-
-    # fh.close()
       
     return layer
 
@@ -329,10 +326,10 @@ class CrossVerifier(object):
 
   def _events_from_layer(self, layer):
     """Populates the sweep line events from the wire layer."""
+    left_edge = min([wire.x1 for wire in layer.wires.values()])
     for wire in layer.wires.values():
       if wire.is_horizontal():
-        self.events.append([wire.x1, 0, wire.object_id, 'add', wire])
-        self.events.append([wire.x2, 2, wire.object_id, 'remove', wire])
+        self.events.append([left_edge, 0, wire.object_id, 'add', wire])
       else:
         self.events.append([wire.x1, 1, wire.object_id, 'query', wire])
 
@@ -345,20 +342,21 @@ class CrossVerifier(object):
 
     for event in self.events:
       event_x, event_type, wire = event[0], event[3], event[4]
-      self.trace_sweep_line(event_x)
       
       if event_type == 'add':
         self.index.add(KeyWirePair(wire.y1, wire))
-      elif event_type == 'remove':
-          self.index.remove(KeyWirePair(wire.y1, wire))
       elif event_type == 'query':
-          if count_only:
-            result += self.index.count(KeyWirePairL(wire.y1),
-                                       KeyWirePairH(wire.y2))
-          else:
-            for kwp in self.index.list(KeyWirePairL(wire.y1),
-                                       KeyWirePairH(wire.y2)):
-              result.add_crossing(wire, kwp.wire)
+        self.trace_sweep_line(event_x)
+        cross_wires = []
+        for kwp in self.index.list(KeyWirePairL(wire.y1),
+                                   KeyWirePairH(wire.y2)):
+          if wire.intersects(kwp.wire):
+            cross_wires.append(kwp.wire)
+        if count_only:
+          result += len(cross_wires)
+        else:
+          for cross_wire in cross_wires:
+            result.add_crossing(wire, cross_wire)
 
     return result
   
@@ -390,9 +388,8 @@ class TracedCrossVerifier(CrossVerifier):
 # Command-line controller.
 if __name__ == '__main__':
     import sys
-    # layer = WireLayer.from_file("tests/5logo.in")
     layer = WireLayer.from_file(sys.stdin)
-    verifier = CrossVerifier(layer)
+    verifier = TracedCrossVerifier(layer)
     
     if os.environ.get('TRACE') == 'jsonp':
       verifier = TracedCrossVerifier(layer)
