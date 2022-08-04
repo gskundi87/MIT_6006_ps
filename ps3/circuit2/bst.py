@@ -35,7 +35,7 @@ class bst(object):
             else:
                 current  = current.right
 
-        current = node(value=key,parent=p)
+        current = node(value=key, parent=p)
 
         if key < p.value:
             p.left = current
@@ -52,35 +52,94 @@ class bst(object):
         return x
             
     def find(self, key):
-        if self.root is None:
-            return None
+        current = self.root
+        
+        while current is not None and key is not current.value:
+            if key < current.value:
+                current = current.left
+            else:
+                current = current.right
+
+        return current
 
     def delete(self, key):
         pass
+        # current = self.find(key)
 
-    def predecessor(self, key):
-        pass
+        # if not current:
+        #     return
+        
+        # if current.left is None and current.right is None:
 
-    def successor(self, key):
-        pass
+    def predecessor(self, node):
+        if not node:
+            return node
+        
+        if node.left:
+            return self.find_max(node.left)
+        
+        while node.parent is not None and node.parent.right is not node:
+            node = node.parent
+            
+        return node.parent
+
+    def successor(self, node):
+        if not node:
+            return node
+        
+        if node.right:
+            return self.find_min(node.right)
+        
+        while node.parent is not None and node.parent.left is not node:
+            node = node.parent
+            
+        return node.parent
 
     def find_min(self, node):
-        pass
+        if node is None:
+            return None
+
+        while node.left:
+            node = node.left
+
+        return node
 
     def find_max(self, node):
-        pass
+        if node is None:
+            return None
+
+        while node.right:
+            node = node.right
+
+        return node
 
     def rank(self, node):
-        pass
-    
-    def bst_sort(self, node):
+        if node is None:
+            return 0
+
+        r = 1
+        
+        if node.left:
+            r += node.left.tree_size
+        
+        while node.parent:
+            if node is node.parent.right:
+                r += 1
+                
+                if node.parent.left:
+                    r += node.parent.left.tree_size
+            
+            node = node.parent
+            
+        return r
+
+    def bst_sort(self, node, A):
         if node is None:
             return
-        self.bst_sort(node.left)
-        print(node.value)
-        self.bst_sort(node.right)
+        self.bst_sort(node.left, A)
+        A.append(node.value)
+        self.bst_sort(node.right, A)
             
-
     def node_height(self, node):
         if node is None:
             return -1
