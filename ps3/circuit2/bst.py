@@ -63,14 +63,39 @@ class bst(object):
         return current
 
     def delete(self, key):
-        pass
-        # current = self.find(key)
-
-        # if not current:
-        #     return
+        node = self.find(key)
         
-        # if current.left is None and current.right is None:
+        if node is None:
+            return None
+        
+        if node is self.root:
+            if node.left is None:
+                self.root = node.right
+                node.right = None
+                
+                if self.root:
+                    self.root.parent = None
+            
+            elif node.right is None:
+                self.root = node.left
+                node.left = None
+                self.root.parent = None
+                
+            else:
+                successor = self.successor(node)
+                
+                if successor is node.right:
+                    
+                    
+                node.value, successor.value = successor.value, node.value
+                
+                if succesor.right:
+                    
+        
+        return node
+                
 
+            
     def predecessor(self, node):
         if not node:
             return node
