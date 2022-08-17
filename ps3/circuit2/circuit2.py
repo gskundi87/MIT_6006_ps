@@ -4,6 +4,7 @@ import json   # Used when TRACE=jsonp
 import os     # Used to get the TRACE environment variable
 import re     # Used when TRACE=jsonp
 import sys    # Used to smooth over the range / xrange issue.
+import bst
 
 # Python 3 doesn't have xrange, and range behaves like xrange.
 if sys.version_info >= (3,):
@@ -165,6 +166,70 @@ class RangeIndex(object):
       if first_key <= key <= last_key:
         result += 1
     return result
+
+# class RangeIndex(object):
+#   """BST-based range index implementation."""
+  
+#   def __init__(self):
+#     """Initially empty range index."""
+#     self.data = bst.bst()
+  
+#   def add(self, key):
+#     """Inserts a key in the range index."""
+#     if key is None:
+#         raise ValueError('Cannot insert nil in the index')
+#     self.data.insert(key)
+  
+#   def remove(self, key):
+#     """Removes a key from the range index."""
+#     self.data.delete(key)
+  
+#   def list(self, first_key, last_key):
+#     """List of values for the keys that fall within [first_key, last_key]."""
+#     node1, parent1 = self.data.find(first_key)
+#     node2, parent2 = self.data.find(last_key)
+    
+#     result = []
+    
+#     if parent1 is None or parent2 is None:
+#         return result
+    
+#     if node1:
+#         while(node1 and node1.value <= last_key):
+#             result.append(node1.value)
+#             node1 = self.data.successor(node1)
+            
+#     else:
+#         if parent1.value < first_key:
+#             temp = self.data.successor(parent1)
+            
+#             while temp and parent1.value < first_key:
+#                 parent1 = temp
+#                 temp = self.data.successor(parent1)
+#         else:
+#             temp = self.data.predecessor(parent1)
+            
+#             while temp and parent1.value > first_key:
+#                 parent1 = temp
+#                 temp = self.data.predecessor(parent1)
+        
+#         while(parent1 and parent1.value <= last_key):
+#             result.append(parent1.value)
+#             parent1 = self.data.successor(parent1)
+
+#     return result
+  
+#   def count(self, first_key, last_key):
+#     """Number of keys that fall within [first_key, last_key]."""
+#     result = 0
+    
+#     if self.data.find(first_key):
+#         result = self.data.rank(last_key) - self.data.rank(first_key) + 1
+        
+#     else:
+#         result = self.data.rank(last_key) - self.data.rank(first_key)
+    
+#     return result
   
 class TracedRangeIndex(RangeIndex):
   """Augments RangeIndex to build a trace for the visualizer."""
@@ -390,6 +455,7 @@ if __name__ == '__main__':
     import sys
     layer = WireLayer.from_file(sys.stdin)
     verifier = TracedCrossVerifier(layer)
+    # os.environ['TRACE'] = 'jsonp'
     
     if os.environ.get('TRACE') == 'jsonp':
       verifier = TracedCrossVerifier(layer)

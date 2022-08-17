@@ -1,7 +1,7 @@
 # implmentation of iterative bst node class and bst tree class for MIT 6.006 ps3
 
 class node(object):
-    def __init__(self,value=None, left=None, right=None, parent=None):
+    def __init__(self, value = None, left = None, right = None, parent = None):
         self.value = value
         self.left = left
         self.right = right
@@ -53,21 +53,26 @@ class bst(object):
             
     def find(self, key):
         current = self.root
+        parent = None
         
         while current is not None and key is not current.value:
+            parent = current
+            
             if key < current.value:
                 current = current.left
             else:
                 current = current.right
 
-        return current
+        return current, parent
 
     def delete(self, key):
-        node = self.find(key)
+        node, _ = self.find(key)
         
+        # Empty tree
         if node is None:
             return None
         
+        # If to be deleted is root
         if node is self.root:
             if node.left is None:
                 self.root = node.right
@@ -83,18 +88,163 @@ class bst(object):
                 
             else:
                 successor = self.successor(node)
+                current = successor.parent
                 
                 if successor is node.right:
+                    self.root = node.right
+                    successor.left = node.left
+                    successor.parent = None
+                    node.left = None
+                    node.right = None
+                    current = self.root
                     
+                elif successor.right is None:
+                    self.root = successor
+                    successor.left = node.left
+                    successor.right = node.right
+                    current.left = None
+                    successor.parent = None
+                    node.left = None
+                    node.right = None
                     
-                node.value, successor.value = successor.value, node.value
-                
-                if succesor.right:
-                    
-        
-        return node
-                
+                else:
+                    self.root = successor
+                    current.left = successor.right
+                    successor.left = node.left
+                    successor.right = node.right
+                    successor.parent = None
+                    node.left = None
+                    node.right = None
 
+                while current is not None:
+                    self.update_node_height(current)
+                    self.update_node_tree_size(current)
+                    current = current.parent
+                    
+            return node
+        
+        current = None
+        
+        # If to be deleted is left child
+        if node is node.parent.left:
+            if node.left is None:
+                current = node.parent
+                current.left = node.right
+                
+                if node.right:
+                    node.right.parent = node.parent
+                    node.right = None
+
+                node.parent = None
+            
+            elif node.right is None:
+                current = node.parent
+                current.left = node.left
+                node.left.parent = node.parent
+                node.left = None
+                node.parent = None
+                
+            else:
+                successor = self.successor(node)
+                current = successor.parent
+                
+                if successor is node.right:
+                    node.parent.left = successor
+                    successor.left = node.left
+                    successor.parent = node.parent
+                    current = successor
+                    node.left = None
+                    node.right = None
+                    node.parent = None
+                    
+                elif successor.right is None:
+                    node.parent.left = successor
+                    successor.left = node.left
+                    successor.right = node.right
+                    successor.left.parent = successor
+                    successor.right.parent = successor
+                    successor.parent = node.parent
+                    current.left = None
+                    node.left = None
+                    node.right = None
+                    node.parent = None
+                    
+                else:
+                    node.parent.left = successor
+                    current.left = successor.right
+                    successor.right.parent = current
+                    successor.left = node.left
+                    successor.right = node.right
+                    successor.left.parent = successor
+                    successor.right.parent = successor
+                    successor.parent = node.parent
+                    node.left = None
+                    node.right = None
+                    node.parent = None
+  
+        # If to be deleted is right child
+        else:
+            if node.left is None:
+                current = node.parent
+                current.right = node.right
+                
+                if node.right:
+                    node.right.parent = node.parent
+                    node.right = None
+
+                node.parent = None
+            
+            elif node.right is None:
+                current = node.parent
+                current.right = node.left
+                node.left.parent = node.parent
+                node.left = None
+                node.parent = None
+                
+            else:
+                successor = self.successor(node)
+                current = successor.parent
+                
+                if successor is node.right:
+                    node.parent.right = successor
+                    successor.left = node.left
+                    successor.parent = node.parent
+                    current = successor
+                    node.left = None
+                    node.right = None
+                    node.parent = None
+                    
+                elif successor.right is None:
+                    node.parent.right = successor
+                    successor.left = node.left
+                    successor.right = node.right
+                    successor.left.parent = successor
+                    successor.right.parent = successor
+                    successor.parent = node.parent
+                    current.left = None
+                    node.left = None
+                    node.right = None
+                    node.parent = None
+                    
+                else:
+                    node.parent.right = successor
+                    current.left = successor.right
+                    successor.right.parent = current
+                    successor.left = node.left
+                    successor.right = node.right
+                    successor.left.parent = successor
+                    successor.right.parent = successor
+                    successor.parent = node.parent
+                    node.left = None
+                    node.right = None
+                    node.parent = None
+                    
+        while current is not None:
+            self.update_node_height(current)
+            self.update_node_tree_size(current)
+            current = current.parent
+                    
+        return node
             
     def predecessor(self, node):
         if not node:
@@ -138,9 +288,28 @@ class bst(object):
 
         return node
 
-    def rank(self, node):
-        if node is None:
-            return 0
+    def rank(self, key):
+        node, parent = self.find(key)
+        
+        if node is None and parent is None:
+            return None
+        
+        elif node is None:
+            if key > parent.value:          
+                node = parent
+                parent = self.successor(parent)
+                
+                while parent is not None and key > parent.value:
+                    node = parent
+                    parent = self.successor(parent)
+            
+            else:
+                node = parent
+                parent = self.predecessor(parent)
+                
+                while parent is not None and key < parent.value:
+                    node = parent
+                    parent = self.successor(parent)
 
         r = 1
         
