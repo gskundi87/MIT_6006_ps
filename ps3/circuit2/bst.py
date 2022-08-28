@@ -72,6 +72,8 @@ class bst(object):
         if node is None:
             return None
         
+        current = None
+        
         # If to be deleted is root
         if node is self.root:
             if node.left is None:
@@ -122,8 +124,6 @@ class bst(object):
                     current = current.parent
                     
             return node
-        
-        current = None
         
         # If to be deleted is left child
         if node is node.parent.left:
@@ -295,21 +295,30 @@ class bst(object):
             return None
         
         elif node is None:
-            if key > parent.value:          
+            if key > parent.value:
                 node = parent
-                parent = self.successor(parent)
+                x = self.successor(parent)
                 
-                while parent is not None and key > parent.value:
-                    node = parent
-                    parent = self.successor(parent)
+                while x is not None and key > x.value:
+                    node = x
+                    x = self.successor(x)
+                    
+                if x is not None and key > x.value:
+                    node = x
             
             else:
                 node = parent
-                parent = self.predecessor(parent)
+                x = self.predecessor(parent)
                 
-                while parent is not None and key < parent.value:
-                    node = parent
-                    parent = self.successor(parent)
+                while x is not None and key < x.value:
+                    node = x
+                    x = self.predecessor(x)
+                    
+                if x is not None:
+                    node = x
+                
+                else:
+                    return 0
 
         r = 1
         

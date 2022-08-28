@@ -4,7 +4,7 @@ import json   # Used when TRACE=jsonp
 import os     # Used to get the TRACE environment variable
 import re     # Used when TRACE=jsonp
 import sys    # Used to smooth over the range / xrange issue.
-import bst
+import avl
 
 # Python 3 doesn't have xrange, and range behaves like xrange.
 if sys.version_info >= (3,):
@@ -138,98 +138,129 @@ class WireLayer(object):
       
     return layer
 
-class RangeIndex(object):
-  """Array-based range index implementation."""
-  
-  def __init__(self):
-    """Initially empty range index."""
-    self.data = []
-  
-  def add(self, key):
-    """Inserts a key in the range index."""
-    if key is None:
-        raise ValueError('Cannot insert nil in the index')
-    self.data.append(key)
-  
-  def remove(self, key):
-    """Removes a key from the range index."""
-    self.data.remove(key)
-  
-  def list(self, first_key, last_key):
-    """List of values for the keys that fall within [first_key, last_key]."""
-    return [key for key in self.data if first_key <= key <= last_key]
-  
-  def count(self, first_key, last_key):
-    """Number of keys that fall within [first_key, last_key]."""
-    result = 0
-    for key in self.data:
-      if first_key <= key <= last_key:
-        result += 1
-    return result
-
 # class RangeIndex(object):
-#   """BST-based range index implementation."""
+#   """Array-based range index implementation."""
   
 #   def __init__(self):
 #     """Initially empty range index."""
-#     self.data = bst.bst()
+#     self.data = []
   
 #   def add(self, key):
 #     """Inserts a key in the range index."""
 #     if key is None:
 #         raise ValueError('Cannot insert nil in the index')
-#     self.data.insert(key)
+#     self.data.append(key)
   
 #   def remove(self, key):
 #     """Removes a key from the range index."""
-#     self.data.delete(key)
+#     self.data.remove(key)
   
 #   def list(self, first_key, last_key):
 #     """List of values for the keys that fall within [first_key, last_key]."""
-#     node1, parent1 = self.data.find(first_key)
-#     node2, parent2 = self.data.find(last_key)
-    
-#     result = []
-    
-#     if parent1 is None or parent2 is None:
-#         return result
-    
-#     if node1:
-#         while(node1 and node1.value <= last_key):
-#             result.append(node1.value)
-#             node1 = self.data.successor(node1)
-            
-#     else:
-#         if parent1.value < first_key:
-#             temp = self.data.successor(parent1)
-            
-#             while temp and parent1.value < first_key:
-#                 parent1 = temp
-#                 temp = self.data.successor(parent1)
-#         else:
-#             temp = self.data.predecessor(parent1)
-            
-#             while temp and parent1.value > first_key:
-#                 parent1 = temp
-#                 temp = self.data.predecessor(parent1)
-        
-#         while(parent1 and parent1.value <= last_key):
-#             result.append(parent1.value)
-#             parent1 = self.data.successor(parent1)
-
-#     return result
+#     return [key for key in self.data if first_key <= key <= last_key]
   
 #   def count(self, first_key, last_key):
 #     """Number of keys that fall within [first_key, last_key]."""
 #     result = 0
-    
-#     if self.data.find(first_key):
-#         result = self.data.rank(last_key) - self.data.rank(first_key) + 1
-        
-#     else:
-#         result = self.data.rank(last_key) - self.data.rank(first_key)
-    
+#     for key in self.data:
+#       if first_key <= key <= last_key:
+#         result += 1
 #     return result
+
+class RangeIndex(object):
+    """AVL-based range index implementation."""
+  
+    def __init__(self):
+        """Initially empty range index."""
+        self.data = avl.avl()
+    
+    def add(self, key):
+        """Inserts a key in the range index."""
+        if key is None:
+            raise ValueError('Cannot insert nil in the index')
+        self.data.insert(key)
+    
+    def remove(self, key):
+        """Removes a key from the range index."""
+        self.data.delete(key)
+    
+    def list(self, first_key, last_key):
+        lca = self.LCA(first_key, last_key)
+        result = []
+        self.node_list(lca, first_key, last_key, result)
+        return result
+        
+    def node_list(self, node, first_key, last_key, result):
+        if node is None:
+            return
+        
+        if first_key <= node.value and node.value <= last_key:
+            result.append(node.value)
+            
+        if first_key <= node.value:
+            self.node_list(node.left, first_key, last_key, result)
+
+        if node.value <= last_key:
+            self.node_list(node.right, first_key, last_key, result)
+            
+    def LCA(self, first_key, last_key):
+        node = self.data.root
+        
+        while node is not None and (first_key > node.value or last_key < node.value):
+            if first_key < node.value:
+                node = node.left
+            
+            else:
+                node = node.right
+                
+        return node
+        
+    def count(self, first_key, last_key):
+        """Number of keys that fall within [first_key, last_key]."""
+        result = 0
+        
+        if self.data.find(first_key):
+            result = self.data.rank(last_key) - self.data.rank(first_key) + 1
+            
+        else:
+            result = self.data.rank(last_key) - self.data.rank(first_key)
+        
+        return result
+  
+#     def list_alt(self, first_key, last_key):
+#         """List of values for the keys that fall within [first_key, last_key]."""
+#         node1, parent1 = self.data.find(first_key)
+#         node2, parent2 = self.data.find(last_key)
+        
+#         result = []
+        
+#         if parent1 is None or parent2 is None:
+#             return result
+        
+#         if node1:
+#             while(node1 and node1.value <= last_key):
+#                 result.append(node1.value)
+#                 node1 = self.data.successor(node1)
+            
+#         else:
+#             if parent1.value < first_key:
+#                 temp = self.data.successor(parent1)
+                
+#                 while temp and parent1.value < first_key:
+#                     parent1 = temp
+#                     temp = self.data.successor(parent1)
+#             else:
+#                 temp = self.data.predecessor(parent1)
+                
+#                 while temp and parent1.value > first_key:
+#                     parent1 = temp
+#                     temp = self.data.predecessor(parent1)
+            
+#             while(parent1 and parent1.value <= last_key):
+#                 result.append(parent1.value)
+#                 parent1 = self.data.successor(parent1)
+        
+#         return result
   
 class TracedRangeIndex(RangeIndex):
   """Augments RangeIndex to build a trace for the visualizer."""
@@ -412,14 +443,15 @@ class CrossVerifier(object):
         self.index.add(KeyWirePair(wire.y1, wire))
       elif event_type == 'query':
         self.trace_sweep_line(event_x)
-        cross_wires = []
-        for kwp in self.index.list(KeyWirePairL(wire.y1),
-                                   KeyWirePairH(wire.y2)):
-          if wire.intersects(kwp.wire):
-            cross_wires.append(kwp.wire)
         if count_only:
-          result += len(cross_wires)
+          result += self.index.count(KeyWirePairL(wire.y1),
+                                    KeyWirePairH(wire.y2))
         else:
+          cross_wires = []
+          for kwp in self.index.list(KeyWirePairL(wire.y1),
+                                    KeyWirePairH(wire.y2)):
+            if wire.intersects(kwp.wire):
+              cross_wires.append(kwp.wire)
           for cross_wire in cross_wires:
             result.add_crossing(wire, cross_wire)
 
