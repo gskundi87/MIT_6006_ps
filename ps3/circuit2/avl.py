@@ -40,6 +40,9 @@ class avl(bst.bst):
     
     def delete(self, key):
         pass
+
+    def delete_node(self, node):
+        pass
     
     def left_rotate(self, x):
         y = x.right

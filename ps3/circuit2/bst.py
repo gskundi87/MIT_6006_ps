@@ -367,7 +367,7 @@ class bst(object):
         def recurse(node):
             if node is None:
                 return [], 0, 0
-            label = str(node.value)
+            label = str(node.height)
             left_lines, left_pos, left_width = recurse(node.left)
             right_lines, right_pos, right_width = recurse(node.right)
             middle = max(right_pos + left_width - left_pos + 1, len(label), 2)

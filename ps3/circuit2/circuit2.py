@@ -180,9 +180,20 @@ class RangeIndex(object):
             raise ValueError('Cannot insert nil in the index')
         self.data.insert(key)
     
-    def remove(self, key):
+    def remove_sweep(self, node, x_sweep):
         """Removes a key from the range index."""
-        self.data.delete(key)
+
+        if node is None:
+          return
+        
+        self.remove_sweep(node.left, x_sweep)
+        self.remove_sweep(node.right, x_sweep)
+
+        if node.value.wire.x2 < x_sweep:
+          self.remove(node)
+
+    def remove(self, node):
+        self.data.delete_node(node)
     
     def list(self, first_key, last_key):
         lca = self.LCA(first_key, last_key)
@@ -425,7 +436,7 @@ class CrossVerifier(object):
     left_edge = min([wire.x1 for wire in layer.wires.values()])
     for wire in layer.wires.values():
       if wire.is_horizontal():
-        self.events.append([left_edge, 0, wire.object_id, 'add', wire])
+        self.events.append([wire.x1, 0, wire.object_id, 'add', wire])
       else:
         self.events.append([wire.x1, 1, wire.object_id, 'query', wire])
 
@@ -442,6 +453,7 @@ class CrossVerifier(object):
       if event_type == 'add':
         self.index.add(KeyWirePair(wire.y1, wire))
       elif event_type == 'query':
+        self.index.remove_sweep(self.index.data.root, event_x)
         self.trace_sweep_line(event_x)
         if count_only:
           result += self.index.count(KeyWirePairL(wire.y1),
@@ -486,7 +498,7 @@ class TracedCrossVerifier(CrossVerifier):
 if __name__ == '__main__':
     import sys
     layer = WireLayer.from_file(sys.stdin)
-    verifier = TracedCrossVerifier(layer)
+    verifier = CrossVerifier(layer)
     # os.environ['TRACE'] = 'jsonp'
     
     if os.environ.get('TRACE') == 'jsonp':
