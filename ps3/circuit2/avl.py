@@ -39,10 +39,54 @@ class avl(bst.bst):
         return current
     
     def delete(self, key):
-        pass
-
-    def delete_node(self, node):
-        pass
+        node, _ = self.find(key)
+        
+        if node is None:
+            print('not found')
+            return
+        
+        current = None
+        
+        if node.right is None:
+            self.transplant(node, node.left)
+            if node.left:
+                current = node.left
+                
+            else:
+                current = node.parent
+            
+        elif node.left is None:
+            self.transplant(node, node.right)
+            
+            if node.right:
+                current = node.right
+                
+            else:
+                current = node.parent
+            
+        else:
+            min_right = self.find_min(node.right)
+            
+            if min_right.parent is not node:
+                current = min_right.parent
+                self.transplant(min_right, min_right.right)
+                min_right.right = node.right
+                min_right.right.parent = min_right
+                
+            if current is not None:
+                current = min_right
+                
+            self.transplant(node, min_right)
+            min_right.left = node.left
+            min_right.left.parent = min_right
+            
+        self.rebalance(current)
+        
+        node.left = None
+        node.right = None
+        node.parent = None
+        
+        return node
     
     def left_rotate(self, x):
         y = x.right
