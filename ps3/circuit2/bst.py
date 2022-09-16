@@ -55,7 +55,7 @@ class bst(object):
         current = self.root
         parent = None
         
-        while current is not None and key != current.value:
+        while current != None and key != current.value:
             parent = current
             
             if key < current.value:
@@ -68,7 +68,7 @@ class bst(object):
     def found(self, key):
         current = self.root
         
-        while current is not None and key is not current.value:
+        while current != None and key != current.value:
             if key < current.value:
                 current = current.left
             else:

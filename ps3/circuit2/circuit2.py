@@ -217,15 +217,7 @@ class RangeIndex(object):
         
     def count(self, first_key, last_key):
         """Number of keys that fall within [first_key, last_key]."""
-        result = 0
-        
-        if self.data.found(first_key):
-            result = self.data.rank(last_key) - self.data.rank(first_key) + 1
-            
-        else:
-            result = self.data.rank(last_key) - self.data.rank(first_key)
-        
-        return result
+        return self.data.rank(last_key) - self.data.rank(first_key)
   
 #     def list_alt(self, first_key, last_key):
 #         """List of values for the keys that fall within [first_key, last_key]."""
@@ -439,7 +431,7 @@ class CrossVerifier(object):
         self.events.append([wire.x1, 1, wire.object_id, 'query', wire])
         count += 1
         
-    print(count)
+    # print(count)
 
   def _compute_crossings(self, count_only):
     """Implements count_crossings and wire_crossings."""
@@ -507,8 +499,8 @@ if __name__ == '__main__':
     # layer = WireLayer.from_file(f)
     # f.close()
     layer = WireLayer.from_file(sys.stdin)
-    verifier = CrossVerifier(layer)
-    # os.environ['TRACE'] = 'jsonp'
+    verifier = TracedCrossVerifier(layer)
+    os.environ['TRACE'] = 'jsonp'
     
     if os.environ.get('TRACE') == 'jsonp':
       verifier = TracedCrossVerifier(layer)
