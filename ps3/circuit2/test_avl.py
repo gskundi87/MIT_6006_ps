@@ -15,3 +15,4 @@ for item in items:
     tree.insert(item)
 
 print(tree)
+tree.print_rank()
