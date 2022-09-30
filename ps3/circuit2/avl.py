@@ -73,7 +73,7 @@ class avl(bst.bst):
                 min_right.right = node.right
                 min_right.right.parent = min_right
                 
-            if current is not None:
+            else:
                 current = min_right
                 
             self.transplant(node, min_right)

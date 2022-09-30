@@ -500,7 +500,7 @@ if __name__ == '__main__':
     # f.close()
     layer = WireLayer.from_file(sys.stdin)
     verifier = TracedCrossVerifier(layer)
-    os.environ['TRACE'] = 'jsonp'
+    # os.environ['TRACE'] = 'jsonp'
     
     if os.environ.get('TRACE') == 'jsonp':
       verifier = TracedCrossVerifier(layer)
