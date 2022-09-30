@@ -4,6 +4,7 @@ import json   # Used when TRACE=jsonp
 import os     # Used to get the TRACE environment variable
 import re     # Used when TRACE=jsonp
 import sys    # Used to smooth over the range / xrange issue.
+import heap_0
 
 # Python 3 doesn't have xrange, and range behaves like xrange.
 if sys.version_info >= (3,):
@@ -392,88 +393,25 @@ class Transition:
 #                 min = key
 #                 self.min_index = i
 
-# class PriorityQueue:
-#     """Heap-based priority queue implementation."""
-#     def __init__(self):
-#         self.heap = [None]
-
-#     def __len__(self):
-#         return len(self.heap) - 1
-
-#     def append(self, key):
-#         if key is None:
-#               raise ValueError('Cannot insert None in the queue')
-
-#         if len(self.heap) == 1:
-#             self.heap.append(key)
-#             return
-
-#         self.heap.append(key)
-#         i = len(self.heap) - 1
-
-#         while i > 1:
-#             parent = i // 2
-#             if key < self.heap[parent]:
-#                 self.heap[i], self.heap[parent] = self.heap[parent], key
-#                 i = parent
-#             else:
-#                 break
-      
-#     def pop(self):
-#         """Removes the minimum element in the queue.
-    
-#         Returns:
-#             The value of the removed element.
-#         """
-#         if len(self.heap) == 1:
-#             return None
-
-#         if len(self.heap) == 2:
-#             return self.heap.pop()
-
-#         self.heap[1], self.heap[len(self.heap)-1] = self.heap[len(self.heap)-1], self.heap[1]
-#         x = self.heap.pop()
-#         self.minHeapify(1)
-#         return x
-        
-#     def minHeapify(self, index):
-#         l = 2*index
-#         r = 2*index + 1
-        
-#         if l < len(self.heap) and self.heap[l] < self.heap[index]:
-#             smallest = l
-#         else:
-#             smallest = index
-            
-#         if r < len(self.heap) and self.heap[r] < self.heap[smallest]:
-#             smallest = r
-            
-#         if smallest != index:
-#             self.heap[index], self.heap[smallest] = self.heap[smallest], self.heap[index]
-#             self.minHeapify(smallest)
-
-#     def min(self):
-#         """Returns the smallest element in the queue."""
-#         return self.heap[1]
-
 class PriorityQueue:
     """Heap-based priority queue implementation."""
-    
     def __init__(self):
-        """Initially empty priority queue."""
         self.heap = [None]
-    
+
     def __len__(self):
-        # Number of elements in the queue.
         return len(self.heap) - 1
-    
+
     def append(self, key):
-        """Inserts an element in the priority queue."""
         if key is None:
-            raise ValueError('Cannot insert None in the queue')
-    
-        i = len(self.heap)
+              raise ValueError('Cannot insert None in the queue')
+
+        if len(self.heap) == 1:
+            self.heap.append(key)
+            return
+
         self.heap.append(key)
+        i = len(self.heap) - 1
+
         while i > 1:
             parent = i // 2
             if key < self.heap[parent]:
@@ -481,42 +419,105 @@ class PriorityQueue:
                 i = parent
             else:
                 break
-    
-    def min(self):
-        """Returns the smallest element in the queue."""
-        return self.heap[1]
-    
+      
     def pop(self):
         """Removes the minimum element in the queue.
     
         Returns:
             The value of the removed element.
         """
-        heap = self.heap
-        popped_key = heap[1]
-        if len(heap) == 2:
-            return heap.pop()
-        heap[1] = key = heap.pop()
+        if len(self.heap) == 1:
+            return None
+
+        if len(self.heap) == 2:
+            return self.heap.pop()
+
+        self.heap[1], self.heap[len(self.heap)-1] = self.heap[len(self.heap)-1], self.heap[1]
+        x = self.heap.pop()
+        self.minHeapify(1)
+        return x
         
-        i = 1
-        while True:
-            left = i * 2
-            if len(heap) <= left:
-                break
-            left_key = heap[left]
-            right = i * 2 + 1
-            right_key = right < len(heap) and heap[right]
-            if right_key and right_key < left_key:
-                child_key = right_key
-                child = right
-            else:
-                child_key = left_key
-                child = left
-            if key <= child_key:
-                break
-            self.heap[i], self.heap[child] = child_key, key
-            i = child
-        return popped_key
+    def minHeapify(self, index):
+        l = 2*index
+        r = 2*index + 1
+        
+        if l < len(self.heap) and self.heap[l] < self.heap[index]:
+            smallest = l
+        else:
+            smallest = index
+            
+        if r < len(self.heap) and self.heap[r] < self.heap[smallest]:
+            smallest = r
+            
+        if smallest != index:
+            self.heap[index], self.heap[smallest] = self.heap[smallest], self.heap[index]
+            self.minHeapify(smallest)
+
+    def min(self):
+        """Returns the smallest element in the queue."""
+        return self.heap[1]
+
+# class PriorityQueue:
+#     """Heap-based priority queue implementation."""
+    
+#     def __init__(self):
+#         """Initially empty priority queue."""
+#         self.heap = [None]
+    
+#     def __len__(self):
+#         # Number of elements in the queue.
+#         return len(self.heap) - 1
+    
+#     def append(self, key):
+#         """Inserts an element in the priority queue."""
+#         if key is None:
+#             raise ValueError('Cannot insert None in the queue')
+    
+#         i = len(self.heap)
+#         self.heap.append(key)
+#         while i > 1:
+#             parent = i // 2
+#             if key < self.heap[parent]:
+#                 self.heap[i], self.heap[parent] = self.heap[parent], key
+#                 i = parent
+#             else:
+#                 break
+    
+#     def min(self):
+#         """Returns the smallest element in the queue."""
+#         return self.heap[1]
+    
+#     def pop(self):
+#         """Removes the minimum element in the queue.
+    
+#         Returns:
+#             The value of the removed element.
+#         """
+#         heap = self.heap
+#         popped_key = heap[1]
+#         if len(heap) == 2:
+#             return heap.pop()
+#         heap[1] = key = heap.pop()
+        
+#         i = 1
+#         while True:
+#             left = i * 2
+#             if len(heap) <= left:
+#                 break
+#             left_key = heap[left]
+#             right = i * 2 + 1
+#             right_key = right < len(heap) and heap[right]
+#             if right_key and right_key < left_key:
+#                 child_key = right_key
+#                 child = right
+#             else:
+#                 child_key = left_key
+#                 child = left
+#             if key <= child_key:
+#                 break
+#             self.heap[i], self.heap[child] = child_key, key
+#             i = child
+#         return popped_key
 
 class Simulation:
     """State needed to compute a circuit's state as it evolves over time."""
@@ -534,7 +535,7 @@ class Simulation:
         self.circuit = circuit
         self.in_transitions = []
         
-        self.queue = PriorityQueue()
+        self.queue = heap_0.MinHeap()
         self.probes = []
         self.probe_all_undo_log = []
 
