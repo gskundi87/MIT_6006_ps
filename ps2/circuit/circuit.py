@@ -698,7 +698,8 @@ class Simulation:
 # Command-line controller.
 if __name__ == '__main__':
     import sys
-    sim = Simulation.from_file(sys.stdin)
+    f = open('tests/5devadas13.in', 'r')
+    sim = Simulation.from_file(f)
     if os.environ.get('TRACE') == 'jsonp':
         sim.layout_from_file(sys.stdin)
         sim.probe_all_gates()
@@ -708,4 +709,5 @@ if __name__ == '__main__':
         sim.jsonp_to_file(sys.stdout)
     else:
         sim.outputs_to_file(sys.stdout)
+    f.close()
 
